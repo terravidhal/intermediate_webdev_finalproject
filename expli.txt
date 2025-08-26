@@ -1,0 +1,267 @@
+Restructurez le projet afin d’avoir des répertoires src et dist. Commencez par créer ces deux répertoires à la racine du projet.
+
+Déplacez index.html, script.js, favicon.ico et style.css dans le répertoire src.
+
+Vous avez maintenant déplacé script.js dans le répertoire src, vous devrez donc mettre à jour la référence dans scriptSpec.js pour :
+
+    1
+
+    const { calculateSimpleInterest, calculateTotalPayableAmount } = require('../src/script');
+
+
+          
+
+            
+
+Si vous exécutez npx webpack maintenant, vous verrez une erreur. C’est parce qu’il ne reconnaît pas un point d’entrée qui est généralement index.js. Vous allez donc ajouter le fichier de configuration pour webpack.
+Créer webpack.config.js
+
+Commencez par créer webpack.config.js à la racine du projet.
+
+Vous devrez définir les propriétés suivantes :
+
+    mode
+    entry (sera './src/script.js')
+    plugins (juste HtmlWebpackPlugin)
+    output.clean (comme true)
+    output.libraryTarget (comme 'window')
+    module (juste une règle pour css)
+
+Indice
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+    11
+    12
+    13
+    14
+    15
+    16
+    17
+    18
+    19
+    20
+    21
+    22
+    23
+    24
+    25
+    26
+    27
+
+    const HtmlWebpackPlugin = require('html-webpack-plugin');
+    module.exports = {
+        mode: "development",
+        entry: "./src/script.js",
+        plugins: [
+            new HtmlWebpackPlugin({
+                template: 'src/index.html',
+                favicon: "./src/favicon.ico",
+            })
+        ],
+        output: {
+            clean: true,
+            libraryTarget: 'window'
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.(css)$/i,
+                    type: "asset/resource",
+                    generator: {
+                        filename: "[name][ext]",
+                    },
+                },
+            ],
+        },
+    };
+
+
+          
+
+            
+              
+              
+            
+            
+              
+              
+            
+            
+            
+          
+
+        
+
+Indice
+
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+    11
+    12
+    13
+    14
+    15
+    16
+    17
+    18
+    19
+    20
+    21
+    22
+    23
+    24
+    25
+    26
+    27
+
+    const HtmlWebpackPlugin = require('html-webpack-plugin');
+    module.exports = {
+        mode: "development",
+        entry: "./src/script.js",
+        plugins: [
+            new HtmlWebpackPlugin({
+                template: 'src/index.html',
+                favicon: "./src/favicon.ico",
+            })
+        ],
+        output: {
+            clean: true,
+            libraryTarget: 'window'
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.(css)$/i,
+                    type: "asset/resource",
+                    generator: {
+                        filename: "[name][ext]",
+                    },
+                },
+            ],
+        },
+    };
+
+
+          
+
+            
+              
+              
+            
+            
+              
+              
+            
+            
+            
+          
+
+        
+
+Vous devriez voir une sortie comme ceci :
+
+    1
+    2
+    3
+    4
+    5
+
+    asset favicon.ico 15 KiB [emitted]
+    asset main.js 3.28 KiB [compared for emit] (name: main)
+    asset index.html 1.17 KiB [emitted]
+    ./src/script.js 932 bytes [built] [code generated]
+    webpack 5.77.0 compiled successfully in 133 ms
+
+
+          
+
+            
+
+Exécuter depuis le répertoire /dist
+
+    1
+    2
+
+    cd dist
+    python3 -m http.server
+
+
+          
+
+            
+
+Si vous naviguez dans l’application, vous remarquerez que nous avons perdu notre CSS.
+Exiger css
+
+Changez la référence css pour utiliser require dans /src/index.html
+Indice
+
+    1
+
+    <link rel="stylesheet" href=<%=require('./style.css')%> type="text/css" media="all" />
+
+
+          
+
+            
+              
+              
+            
+            
+              
+              
+            
+            
+            
+          
+
+        
+
+Indice
+
+    1
+
+    <link rel="stylesheet" href=<%=require('./style.css')%> type="text/css" media="all" />
+
+
+          
+
+            
+              
+              
+            
+            
+              
+              
+            
+            
+            
+          
+
+        
+
+Référence à main.js au lieu de script.js
+
+Webpack regroupe notre fichier JavaScript dans main.js. Et cela sera ajouté par Webpack, donc nous pouvons supprimer en toute sécurité la référence à script.js dans /src/index.html.
+Webpack encore
+
+Ouvrez un autre terminal à la racine de votre projet et exécutez npx webpack. Et depuis votre premier terminal (dans le répertoire dist), exécutez le serveur HTTP.
+
+Si vous actualisez votre navigateur maintenant, tout devrait fonctionner comme prévu.
